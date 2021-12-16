@@ -1,8 +1,9 @@
 import { Box, Container, Heading, HStack, Input, Select, Button, Flex, Tooltip} from '@chakra-ui/react'
 import React, { useRef, useState, useEffect } from 'react'
+import HorizontalBarChart from '../../components/Charts/HorizontalBarChart';
 import LineChart from '../../components/Charts/LineChart';
 import PieChart from '../../components/Charts/PieChart';
-import { IP_CHART_ID, LOG_FILES, REQUESTS_CHART_ID, REQUEST_THRESHOLD_DEFAULT } from './constants';
+import { IP_CHART_ID, LOG_FILES, REQUESTS_CHART_ID, REQUEST_THRESHOLD_DEFAULT, TOP_VALUE_CHART_ID } from './constants';
 import { generatePayloadApi, getDataWithPayload } from './helpers';
 import PickDate from './PickDate';
 
@@ -13,6 +14,7 @@ export default function Dashboard() {
   const [endDate, setEndDate] = useState(new Date());
   const [ipChartData, setIpChartData] = useState([]);
   const [requestChartData, setRequestChartData] = useState([]);
+  const [osChartData, setOsChartData] = useState([]);
   const [sourceId, setSourceId] = useState(0);
   
   useEffect(() => {
@@ -21,7 +23,11 @@ export default function Dashboard() {
       const responseData = await getDataWithPayload(_payload, LOG_FILES[sourceId]);
       fnSetData(responseData);
     }
-    Promise.all([fetchData(setRequestChartData, REQUESTS_CHART_ID), fetchData(setIpChartData, IP_CHART_ID)]);
+    Promise.all([
+      fetchData(setRequestChartData, REQUESTS_CHART_ID),
+      fetchData(setIpChartData, IP_CHART_ID),
+      fetchData(setOsChartData, TOP_VALUE_CHART_ID)
+    ]);
     
   },[startDate, endDate, sourceId])
   
@@ -116,10 +122,20 @@ export default function Dashboard() {
         />
       </Flex>
       <Flex bg="white" borderRadius="6px" border="1px" borderColor="#CBD5E0"
-        padding="10px" flexDirection="column" marginY="32px" height="450px"
+        padding="10px" flexDirection="column" marginTop="32px" height="450px"
       >
         <Heading as="h5" size="xs" marginBottom="12px">Client IP</Heading>
-          <PieChart data={ipChartData} 
+          <PieChart 
+            data={ipChartData} 
+          />
+      </Flex>
+      <Flex bg="white" borderRadius="6px" border="1px" borderColor="#CBD5E0"
+        padding="10px" flexDirection="column" marginY="32px" height="450px"
+      >
+        <Heading as="h5" size="xs" marginBottom="12px">Top values of OS</Heading>
+          <HorizontalBarChart
+            data={osChartData} 
+            xAxisTitle="Count of records"
           />
       </Flex>
       </Container>
