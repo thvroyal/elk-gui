@@ -9,8 +9,8 @@ import { Box, Divider, Text } from '@chakra-ui/react';
 export default class PieChart extends ReactAmChart {
   static propTypes = {
     data: arrayOf(shape({
-      address: string,
-      value: number
+      key: string,
+      doc_count: number
     })),
     innerRadius: number,
     labelFontSize: number,
@@ -40,8 +40,8 @@ export default class PieChart extends ReactAmChart {
       //Chart legend
       chart.legend = new am4charts.Legend();
       chart.legend.useDefaultMarker = true;
-      chart.legend.position = "right";
-      chart.legend.labels.template.text = "[{color}]{address}";
+      chart.legend.position = "bottom";
+      chart.legend.labels.template.text = "[{color}]{key}";
       chart.legend.valueLabels.template.disabled = true;
       var marker = chart.legend.markers.template.children.getIndex(0);
       marker.cornerRadius(12, 12, 12, 12);
@@ -50,8 +50,8 @@ export default class PieChart extends ReactAmChart {
       marker.stroke = am4core.color("#ccc");
 
       this.pieSeries = chart.series.push(new am4charts.PieSeries());
-      this.pieSeries.dataFields.value = 'value';
-      this.pieSeries.dataFields.category = 'address';
+      this.pieSeries.dataFields.value = 'doc_count';
+      this.pieSeries.dataFields.category = 'key';
       this.pieSeries.slices.template.stroke = am4core.color(strokeColor);
       this.pieSeries.slices.template.strokeWidth = 2;
       this.pieSeries.slices.template.strokeOpacity = 1;
@@ -59,7 +59,7 @@ export default class PieChart extends ReactAmChart {
 
       // Set chart labels
       const percentageValue = !isPercentageDisabled ? ` ({value.percent.formatNumber('#.0')}%)` : '';
-      this.pieSeries.labels.template.text = `{address}: {value}${percentageValue}`;
+      this.pieSeries.labels.template.text = `{key}: {doc_count}${percentageValue}`;
       this.pieSeries.labels.template.fontSize = labelFontSize;
       this.pieSeries.labels.template.fontFamily = fontFamily;
       this.pieSeries.labels.template.fill = am4core.color(labelColor);
@@ -85,7 +85,7 @@ export default class PieChart extends ReactAmChart {
       this.pieSeries.labels.template.adapter.add("hidden", this.hideZeroValue);
       this.pieSeries.slices.template.tooltipHTML = ReactDOMServer.renderToString(this.drawToolTip());
       const percentageValue = !isPercentageDisabled ? ` ({value.percent.formatNumber('#.0')}%)` : '';
-      this.pieSeries.labels.template.text = `{address}: {value}${percentageValue}`;
+      this.pieSeries.labels.template.text = `{key}: {doc_count}${percentageValue}`;
       this.pieSeries.ticks.template.disabled = true;
       this.pieSeries.labels.template.disabled = true;
       chart.data = data;
@@ -102,12 +102,12 @@ export default class PieChart extends ReactAmChart {
   drawToolTip() {
     const { valueLabel } = this.props;
     return ( 
-      <Box p="5px" color="gba(0, 0, 0, 0.87)" fontSize="12px" minW="120px">
-        <Text p="2px 0" fontWeight="500" color="black" fontSize="14px">{'{address}'}</Text>
+      <Box p="5px" color="rgba(0, 0, 0, 0.87)" fontSize="12px" minW="120px">
+        <Text p="2px 0" fontWeight="500" color="black" fontSize="14px">{'{key}'}</Text>
         <Divider />
         <Box p="7px 0 3px">
           <Text color="black">{valueLabel}</Text>
-          <Text color="black" fontWeight="500">{`{value}`}</Text>
+          <Text color="black" fontWeight="500">{`{doc_count}`}</Text>
         </Box>
       </Box>
     );

@@ -1,33 +1,33 @@
 import React from 'react';
-import { arrayOf, bool, number, shape, string, oneOfType } from 'prop-types';
+import { arrayOf, number, shape, string } from 'prop-types';
 import ReactDOMServer from "react-dom/server"; 
 import { ReactAmChart } from "../../AmChartReact";
 import ChartTooltip from "./ChartToolTip";
+import moment from 'moment';
 
-const FIRST_VALUE = "firstValue";
-const SECOND_VALUE = "secondValue";
-const DATE_CHANGE_VALUE = "change"
-const TIME = "time";
+const FIRST_VALUE = "doc_count";
+const TIME = "key_axis";
 
 export default class LineChart extends ReactAmChart {
   static propTypes = {
-    isCompare: bool,
     typeSelect: string,
     fontFamily: string,
     firstRange: string,
     secondRange: string,
     data: arrayOf(shape({
-      time: string.isRequired,
-      firstValue: number,
-      secondValue: number,
-      change: oneOfType([string, number])
+      key_as_string: string.isRequired,
+      doc_count: number,
     })).isRequired,
     chartColor: shape({
       firstLineColor: string,
       secondLineColor: string,
       labelColor: string,
-      tooltipBackgroundColor: string
-    })
+      tooltipBackgroundColor: string,
+      thresholdLine: string,
+    }),
+    threshold: number,
+    fromDate: string,
+    endDate: string,
   }
 
   static defaultProps = {
@@ -36,10 +36,11 @@ export default class LineChart extends ReactAmChart {
       firstLineColor: "#00BCD4",
       secondLineColor: "#3F51B5",
       labelColor:"#757575",
-      tooltipBackgroundColor:"#FFFFFF"  
+      tooltipBackgroundColor:"#FFFFFF",
+      thresholdLine: '#DC143C' 
     },
-    isCompare: false,
-    fontFamily: 'Roboto, "Helvetica Neue", sans-serif'
+    fontFamily: 'Roboto, "Helvetica Neue", sans-serif',
+    threshold: 0,
   }
 
   valueAxis;
@@ -47,19 +48,49 @@ export default class LineChart extends ReactAmChart {
   secondSeries;
   bullet;
   comparedBullet;
+  avgLine;
+  
+  preProcessData = (data) => {
+    if (data) {
+      const { fromDate, endDate } = this.props;
+      let newData = [...data];
+      if (moment(data[0]?.key_as_string).toISOString() !== moment(fromDate).toISOString()) {
+        const obj = {
+          key_as_string: moment(fromDate).toISOString(),
+          doc_count: 0,
+        }
+        newData = [obj,...newData];
+      }
+      
+      if (moment(data[data.length - 1]?.key_as_string).toISOString() !== moment(endDate).toISOString()) {
+        const obj = {
+          key_as_string: moment(endDate).toISOString(),
+          doc_count: 0,
+        }
+        newData = [...newData, obj];
+      }
+      return newData.map(item => {
+        return {
+          ...item,
+          key_axis: moment(item.key_as_string).format('DD/MM@hh:mm'),
+          key_as_string: moment(item.key_as_string).format('DD/MM/YYYY hh:mm:ss')
+        }
+      })
+    }
+    else {
+      return [];
+    }
+  }
   drawFunction(chartId, prevChart, am4core, am4charts) {
-    const { isCompare, data, selectBy, firstRange, secondRange, chartColor, fontFamily } = this.props;
+    const { data, selectBy, firstRange, secondRange, chartColor, fontFamily, threshold } = this.props;
     let chart = prevChart;
 
         const htmlToolTipContent =  ReactDOMServer.renderToString(
           <ChartTooltip
-            isCompare={isCompare}
             chartValueLabel={selectBy}
             firstValueLabel={firstRange}
             secondValueLabel={secondRange}
             firstValue={FIRST_VALUE}
-            secondValue={SECOND_VALUE}
-            dataChangeValue={DATE_CHANGE_VALUE}
           />
         )
 
@@ -70,15 +101,15 @@ export default class LineChart extends ReactAmChart {
             chart.zoomOutButton.disabled = true;
 
             //Create X axis for time
-            const categoryAxis = chart.xAxes.push(new am4charts.CategoryAxis());
-            categoryAxis.renderer.grid.template.strokeOpacity = 0;
-            categoryAxis.dataFields.category = TIME;
-            categoryAxis.cursorTooltipEnabled = false;
-            categoryAxis.startLocation = 0;
-            categoryAxis.endLocation = 1;
-            categoryAxis.renderer.labels.template.fontSize = 12;
-            categoryAxis.renderer.labels.template.fontFamily = fontFamily;
-            categoryAxis.renderer.labels.template.fill = am4core.color(chartColor.labelColor);
+            const dateAxis = chart.xAxes.push(new am4charts.DateAxis());
+            dateAxis.renderer.grid.template.strokeOpacity = 0;
+            dateAxis.dataFields.category = TIME;
+            dateAxis.cursorTooltipEnabled = false;
+            dateAxis.startLocation = 0;
+            dateAxis.endLocation = 1;
+            dateAxis.renderer.labels.template.fontSize = 12;
+            dateAxis.renderer.labels.template.fontFamily = fontFamily;
+            dateAxis.renderer.labels.template.fill = am4core.color(chartColor.labelColor);
 
             //Create Y axis for value
             this.valueAxis = chart.yAxes.push(new am4charts.ValueAxis());
@@ -95,7 +126,7 @@ export default class LineChart extends ReactAmChart {
             // Create first LineSeries
             this.firstSeries = chart.series.push(new am4charts.LineSeries());
             this.firstSeries.dataFields.valueY = FIRST_VALUE;
-            this.firstSeries.dataFields.categoryX = TIME;
+            this.firstSeries.dataFields.dateX = TIME;
             this.firstSeries.stroke = am4core.color(chartColor.firstLineColor);
             this.firstSeries.strokeWidth = 3;
 
@@ -103,21 +134,19 @@ export default class LineChart extends ReactAmChart {
             this.bullet.circle.strokeWidth = 2;
             this.bullet.circle.radius = 4;
             this.bullet.circle.fill = am4core.color(chartColor.firstLineColor);
+            
+            // Create threshold line
+            this.avgLine = this.valueAxis.axisRanges.create();
+            this.avgLine.value = 0;
+            this.avgLine.grid.stroke = am4core.color(chartColor.thresholdLine);
+            this.avgLine.grid.strokeWidth = 2;
+            this.avgLine.grid.strokeOpacity = 1;
+            this.avgLine.grid.above = true;
 
             //Create HTML toolTips
             this.firstSeries.tooltip.getFillFromObject = false;
             this.firstSeries.tooltip.background.fill = am4core.color(chartColor.tooltipBackgroundColor);
             this.firstSeries.tooltip.tooltipContainer.exportable = false;
-
-            this.secondSeries = chart.series.push(new am4charts.LineSeries());
-            this.secondSeries.dataFields.valueY = SECOND_VALUE;
-            this.secondSeries.dataFields.categoryX = TIME;
-            this.secondSeries.stroke = am4core.color(chartColor.secondLineColor);
-            this.secondSeries.strokeWidth = 3;
-            this.comparedBullet = this.secondSeries.bullets.push(new am4charts.CircleBullet());
-            this.comparedBullet.circle.strokeWidth = 2;
-            this.comparedBullet.circle.radius = 4;
-            this.comparedBullet.circle.fill = am4core.color(chartColor.secondLineColor);
 
             // Create cursor
             chart.cursor = new am4charts.XYCursor();
@@ -130,18 +159,10 @@ export default class LineChart extends ReactAmChart {
             chart.cursor.behavior = "none"; // Disable zoom
         }
 
-        if (isCompare) {
-          this.secondSeries.show();    
-        } else if (this.secondSeries) {
-          this.secondSeries.hide();
-        }
-
         if (data.length === 1) {
           this.bullet.disabled = false;
-          this.comparedBullet.disabled = false;
         } else {
           this.bullet.disabled = true;
-          this.comparedBullet.disabled = true;
         }
 
         // Update toolTip for 1st line
@@ -150,7 +171,8 @@ export default class LineChart extends ReactAmChart {
         // Update text for line serie
         this.valueAxis.title.text = selectBy;
 
-        chart.data = data;
+        chart.data = this.preProcessData(data);
+        this.avgLine.value = threshold;
         return chart;
     }
 }

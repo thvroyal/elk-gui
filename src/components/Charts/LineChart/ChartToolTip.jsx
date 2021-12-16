@@ -1,6 +1,6 @@
 import React, { Component } from 'react';
-import styles from './styles.scss';
 import { string } from 'prop-types';
+import { Box, Flex } from '@chakra-ui/react';
 
 export default class ChartToolTip extends Component {
 
@@ -20,21 +20,21 @@ export default class ChartToolTip extends Component {
       } = this.props;
 
       return (
-        <div data-test="tooltipChart" className={styles.boxTooltip}>
+        <Box color="rgba(0, 0, 0, 0.87)" fontSize="12px">
           <div>
-            <div data-test="tooltipChartTime" className={styles.title}>{"{time}"}</div>
-            <hr className={styles.dividerTooltip}/>
+            <Box data-test="tooltipChartTime" fontWeight="600">{"{key_as_string}"}</Box>
+            <Box width="17px" borderBottom="2px" borderColor="#979797" marginY="7px" />
               {
                 chartValueLabel && 
-                <div className={styles.firstChoice}>
+                <Flex color="rgba(0,0,0,0.87)" justify="space-between">
                   {chartValueLabel}: 
-                  <span data-test="tooltipChartFirstValue" className={styles.firstValue}>
+                  <Box data-test="tooltipChartFirstValue" marginLeft="50px" fontWeight="600">
                     {`{${firstValue}}`}
-                  </span>
-                </div>
+                  </Box>
+                </Flex>
               }   
           </div>
-        </div>
+        </Box>
       );
   }
 }
