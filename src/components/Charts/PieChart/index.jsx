@@ -6,6 +6,14 @@ import { isEqual, cloneDeep } from 'lodash';
 
 import { Box, Divider, Text } from '@chakra-ui/react';
 
+const COLOR_LIST = [
+  '#88E0EF',
+  '#161E54',
+  '#FF5151',
+  '#49BEB7',
+  '#FF9B6A',
+  '#95CD41',
+]
 export default class PieChart extends ReactAmChart {
   static propTypes = {
     data: arrayOf(shape({
@@ -63,6 +71,7 @@ export default class PieChart extends ReactAmChart {
       this.pieSeries.labels.template.fontSize = labelFontSize;
       this.pieSeries.labels.template.fontFamily = fontFamily;
       this.pieSeries.labels.template.fill = am4core.color(labelColor);
+      this.pieSeries.colors.list = COLOR_LIST.map((color) => new am4core.color(color));
       
       // Create initial animation
       this.pieSeries.hiddenState.properties.opacity = 1;
