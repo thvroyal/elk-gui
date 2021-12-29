@@ -5,7 +5,9 @@ export const TOP_VALUE_CHART_ID = 3;
 export const REQUEST_THRESHOLD_DEFAULT = 10000;
 
 export const LOG_FILES = [
-    'ddos-12132025',
-    'ddos-12132035',
-    'filebeat-*'
-]
+    'fake_log',
+    'filebeat-*',
+    'filebeat-7.16.2-2021.12.26-000001',
+];
+
+export const BASE_URL = 'http://192.168.2.7:9200';

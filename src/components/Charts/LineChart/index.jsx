@@ -6,7 +6,7 @@ import ChartTooltip from "./ChartToolTip";
 import moment from 'moment';
 
 const FIRST_VALUE = "doc_count";
-const TIME = "key_axis";
+const TIME = "key_as_string";
 
 export default class LineChart extends ReactAmChart {
   static propTypes = {
@@ -54,26 +54,26 @@ export default class LineChart extends ReactAmChart {
     if (data) {
       const { fromDate, endDate } = this.props;
       let newData = [...data];
-      if (moment(data[0]?.key_as_string).toISOString() !== moment(fromDate).toISOString()) {
-        const obj = {
-          key_as_string: moment(fromDate).toISOString(),
-          doc_count: 0,
-        }
-        newData = [obj,...newData];
-      }
+      // if (moment(data[0]?.key_as_string).toISOString() !== moment(fromDate).toISOString()) {
+      //   const obj = {
+      //     key_as_string: new Date(fromDate),
+      //     doc_count: 0,
+      //   }
+      //   newData = [obj,...newData];
+      // }
       
-      if (moment(data[data.length - 1]?.key_as_string).toISOString() !== moment(endDate).toISOString()) {
-        const obj = {
-          key_as_string: moment(endDate).toISOString(),
-          doc_count: 0,
-        }
-        newData = [...newData, obj];
-      }
+      // if (moment(data[data.length - 1]?.key_as_string).toISOString() !== moment(endDate).toISOString()) {
+      //   const obj = {
+      //     key_as_string: new Date(endDate),
+      //     doc_count: 0,
+      //   }
+      //   newData = [...newData, obj];
+      // }
       return newData.map(item => {
         return {
           ...item,
           key_axis: moment(item.key_as_string).format('DD/MM@hh:mm'),
-          key_as_string: moment(item.key_as_string).format('DD/MM/YYYY hh:mm:ss')
+          key_as_string: new Date(item.key_as_string)
         }
       })
     }
@@ -170,8 +170,9 @@ export default class LineChart extends ReactAmChart {
 
         // Update text for line serie
         this.valueAxis.title.text = selectBy;
-
-        chart.data = this.preProcessData(data);
+        const dataProcessed = this.preProcessData(data);
+        console.log(dataProcessed);
+        chart.data = dataProcessed;
         this.avgLine.value = threshold;
         return chart;
     }

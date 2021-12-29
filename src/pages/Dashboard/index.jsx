@@ -1,4 +1,5 @@
-import { Box, Container, Heading, HStack, Input, Select, Button, Flex, Tooltip} from '@chakra-ui/react'
+import { Box, Container, Heading, HStack, Input, Select, Button, Flex, Tooltip, useToast} from '@chakra-ui/react'
+import _ from 'lodash';
 import React, { useRef, useState, useEffect } from 'react'
 import HorizontalBarChart from '../../components/Charts/HorizontalBarChart';
 import LineChart from '../../components/Charts/LineChart';
@@ -7,15 +8,27 @@ import { IP_CHART_ID, LOG_FILES, REQUESTS_CHART_ID, REQUEST_THRESHOLD_DEFAULT, T
 import { generatePayloadApi, getDataWithPayload } from './helpers';
 import PickDate from './PickDate';
 
+const MAP_DURATION = {
+  seconds: 1,
+  minutes: 60,
+  hours: 60*60,
+  days: 60*60*24,
+};
+
 export default function Dashboard() {
   const [request, setRequest] = useState(REQUEST_THRESHOLD_DEFAULT);
   const [perTime, setPerTime] = useState(1);
+  const [unit, setUnit] = useState('seconds'); //default: second
   const [startDate, setStartDate] = useState(new Date());
   const [endDate, setEndDate] = useState(new Date());
   const [ipChartData, setIpChartData] = useState([]);
   const [requestChartData, setRequestChartData] = useState([]);
   const [osChartData, setOsChartData] = useState([]);
   const [sourceId, setSourceId] = useState(0);
+  const [realtime, setRealtime] = useState(false);
+  const [intervalIdState, setIntervalIdState] = useState(null);
+  
+  const warningToast = useToast();
   
   useEffect(() => {
     async function fetchData(fnSetData, type) {
@@ -23,13 +36,46 @@ export default function Dashboard() {
       const responseData = await getDataWithPayload(_payload, LOG_FILES[sourceId]);
       fnSetData(responseData);
     }
-    Promise.all([
-      fetchData(setRequestChartData, REQUESTS_CHART_ID),
-      fetchData(setIpChartData, IP_CHART_ID),
-      fetchData(setOsChartData, TOP_VALUE_CHART_ID)
-    ]);
     
-  },[startDate, endDate, sourceId])
+    if (!realtime) {
+      Promise.all([
+        fetchData(setRequestChartData, REQUESTS_CHART_ID),
+        fetchData(setIpChartData, IP_CHART_ID),
+        fetchData(setOsChartData, TOP_VALUE_CHART_ID)
+      ]);
+      clearInterval(intervalIdState);
+      return;
+    }
+    
+    const intervalId = setInterval(async () => {
+      setEndDate(new Date());
+      await Promise.all([
+        fetchData(setRequestChartData, REQUESTS_CHART_ID),
+        // fetchData(setIpChartData, IP_CHART_ID),
+        // fetchData(setOsChartData, TOP_VALUE_CHART_ID)
+      ]);
+      
+      // handle alert notifications
+      if (requestChartData) {
+        //get list
+        const numOfRequests = MAP_DURATION[unit] * perTime;
+        const newRequestAtTime = _.slice(requestChartData, requestChartData.length - numOfRequests);
+        const maxRequest = _.maxBy(newRequestAtTime, (timestamp) => timestamp['doc_count']);
+        
+        if (_.get(maxRequest, 'doc_count', 0) >= request) {
+          warningToast({
+            title: `DDoS detection!`,
+            status: 'error',
+            isClosable: true,
+            position: 'top',
+          })
+        }
+      }
+    }, perTime * MAP_DURATION[unit] * 1000);
+    setIntervalIdState(intervalId);
+  
+    return () => clearInterval(intervalId);
+  },[startDate, endDate, sourceId, perTime, realtime, unit]);
   
   const requestRef = useRef();
   const perTimeRef = useRef();
@@ -46,8 +92,13 @@ export default function Dashboard() {
     setSourceId(event.target.value);
   }
   
+  const onChangeUnit = (event) => {
+    setUnit(event.target.value);
+  }
+  
   const handleClickNow = () => {
     setEndDate(new Date());
+    setRealtime(!realtime);
   }
   const handleClickRefresh = () => {
     console.log({
@@ -81,7 +132,7 @@ export default function Dashboard() {
             <Button 
               size="sm" 
               colorScheme="teal" 
-              variant='outline' 
+              variant={realtime ? 'solid' : 'outline'}
               onClick={handleClickNow}
             >
               Now
@@ -101,8 +152,9 @@ export default function Dashboard() {
             <Input variant="unstyled" type="text" defaultValue={perTime} size="lg" maxW="60px" fontWeight={500} 
               ref={perTimeRef} onChange={onChangePerTimeInput}
             />
-            <Select variant="unstyled" size="lg" width="100px">
-              <option value='minutes' defaultChecked>minutes</option>
+            <Select variant="unstyled" size="lg" width="100px" onChange={onChangeUnit}>
+              <option value='seconds' defaultChecked>seconds</option>
+              <option value='minutes'>minutes</option>
               <option value='hours'>hours</option>
               <option value='days'>days</option>
             </Select>
@@ -117,8 +169,8 @@ export default function Dashboard() {
         <LineChart 
           data={requestChartData}
           threshold={parseFloat(request)}
-          fromDate={startDate}
-          endDate={endDate}
+          fromDate={startDate.toString()}
+          endDate={endDate.toString()}
         />
       </Flex>
       <Flex bg="white" borderRadius="6px" border="1px" borderColor="#CBD5E0"

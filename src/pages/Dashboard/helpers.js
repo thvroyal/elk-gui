@@ -1,19 +1,19 @@
 import axios from 'axios';
 import { get } from 'lodash';
-import { IP_CHART_ID, REQUESTS_CHART_ID, TOP_VALUE_CHART_ID } from './constants';
+import { IP_CHART_ID, REQUESTS_CHART_ID, TOP_VALUE_CHART_ID, BASE_URL } from './constants';
 import moment from 'moment';
 
 export const getDataWithPayload = async (payload, source) => {
     try {
         const response = await axios({
             method: 'GET',
-            url: `http://192.168.2.7:9200/${source}/_search`,
+            url: `${BASE_URL}/${source}/_search`,
             params: {
                 source: JSON.stringify(payload),
                 source_content_type: 'application/json'
             },
             headers: {
-                Authorization: 'Basic ZWxhc3RpYzpWdWhhaWRhbmcxNTdA',
+                // Authorization: 'Basic ZWxhc3RpYzpWdWhhaWRhbmcxNTdA',
                 'Content-Type': 'application/json'
             }
         });
@@ -36,53 +36,49 @@ export const generatePayloadApi = (fromDate, toDate, type) => {
     switch (type) {
         case REQUESTS_CHART_ID:
             return {
-                "aggs": {
-                  "0": {
-                    "date_histogram": {
-                      "field": "@timestamp",
-                      "calendar_interval": "1m",
-                      "time_zone": "Asia/Saigon"
-                    }
-                  }
-                },
-                "size": 0,
-                "fields": [
-                  {
+              "aggs": {
+                "0": {
+                  "date_histogram": {
                     "field": "@timestamp",
-                    "format": "date_time"
-                  },
-                  {
-                    "field": "user_agent.version", //event.created
-                    "format": "date_time"
-                  }
-                ],
-                "script_fields": {},
-                "stored_fields": [
-                  "*"
-                ],
-                "runtime_mappings": {},
-                "_source": {
-                  "excludes": []
-                },
-                "query": {
-                  "bool": {
-                    "must": [],
-                    "filter": [
-                      {
-                        "range": {
-                          "@timestamp": {
-                            "format": "strict_date_optional_time",
-                            "gte": fromDateFormatted,
-                            "lte": toDateFormatted,
-                          }
-                        }
-                      }
-                    ],
-                    "should": [],
-                    "must_not": []
+                    "fixed_interval": "1s",
+                    "time_zone": "Asia/Ho_Chi_Minh"
                   }
                 }
+              },
+              "size": 0,
+              "fields": [
+                {
+                  "field": "@timestamp",
+                  "format": "date_time"
+                }
+              ],
+              "script_fields": {},
+              "stored_fields": [
+                "*"
+              ],
+              "runtime_mappings": {},
+              "_source": {
+                "excludes": []
+              },
+              "query": {
+                "bool": {
+                  "must": [],
+                  "filter": [
+                    {
+                      "range": {
+                        "@timestamp": {
+                          "format": "strict_date_optional_time",
+                          "gte": fromDateFormatted,
+                          "lte": toDateFormatted
+                        }
+                      }
+                    }
+                  ],
+                  "should": [],
+                  "must_not": []
+                }
               }
+            }
         case IP_CHART_ID:
             return {
                 "aggs": {
