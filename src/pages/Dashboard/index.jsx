@@ -63,12 +63,15 @@ export default function Dashboard() {
         const maxRequest = _.maxBy(newRequestAtTime, (timestamp) => timestamp['doc_count']);
         
         if (_.get(maxRequest, 'doc_count', 0) >= request) {
-          warningToast({
-            title: `DDoS detection!`,
-            status: 'error',
-            isClosable: true,
-            position: 'top',
-          })
+          if (!warningToast.isActive('warning-toast')){
+            warningToast({
+              id: 'warning-toast',
+              title: `DDoS detection!`,
+              status: 'error',
+              isClosable: true,
+              position: 'top',
+            })
+          }
         }
       }
     }, perTime * MAP_DURATION[unit] * 1000);
