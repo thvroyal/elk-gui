@@ -1,9 +1,12 @@
-import { Box, Container, Heading, HStack, Input, Select, Button, Flex, Tooltip, useToast} from '@chakra-ui/react'
+import { AddIcon } from '@chakra-ui/icons';
+import { Box, Container, Heading, HStack, Input, Select, Button, Flex, Tooltip, useToast, ButtonGroup, IconButton} from '@chakra-ui/react'
 import _ from 'lodash';
 import React, { useRef, useState, useEffect } from 'react'
 import HorizontalBarChart from '../../components/Charts/HorizontalBarChart';
 import LineChart from '../../components/Charts/LineChart';
 import PieChart from '../../components/Charts/PieChart';
+import CreateRuleModal from '../../components/CreateRuleModal';
+import ListRulesDrawer from '../../components/ListRulesDrawer';
 import { IP_CHART_ID, LOG_FILES, REQUESTS_CHART_ID, REQUEST_THRESHOLD_DEFAULT, TOP_VALUE_CHART_ID } from './constants';
 import { generatePayloadApi, getDataWithPayload } from './helpers';
 import PickDate from './PickDate';
@@ -113,14 +116,10 @@ export default function Dashboard() {
     <Box bg="#F7FAFC">
       <Flex justify="space-between" align="center" bg="white" w="100%" py="24px" px="24px" borderBottom="1px" borderColor="#CBD5E0">
           <Heading as="h4" fontSize="24px" color="#171923" whiteSpace="nowrap">ELK-Dang Dashboard</Heading>
-          <Select width="300px" onChange={onChangeLogFile}>
-            {LOG_FILES.map((filename, index) => (
-              <option value={index} key={filename} defaultChecked={!index}>
-                {filename}
-              </option>
-              )) 
-            }
-          </Select>
+          <ButtonGroup size='sm' isAttached variant='outline'>
+            <ListRulesDrawer placement="right" />
+            <CreateRuleModal />
+          </ButtonGroup>
       </Flex>
       <Container maxW="1328px">
       <HStack spacing="32px" marginTop="26px">
