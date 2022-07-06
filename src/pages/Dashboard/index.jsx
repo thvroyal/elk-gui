@@ -1,7 +1,6 @@
-import { AddIcon } from '@chakra-ui/icons';
-import { Box, Container, Heading, HStack, Input, Select, Button, Flex, Tooltip, useToast, ButtonGroup, IconButton} from '@chakra-ui/react'
+import { Box, Button, ButtonGroup, Container, Flex, Heading, HStack, Input, Select, Tooltip, useToast } from '@chakra-ui/react';
 import _ from 'lodash';
-import React, { useRef, useState, useEffect } from 'react'
+import { useEffect, useRef, useState } from 'react';
 import HorizontalBarChart from '../../components/Charts/HorizontalBarChart';
 import LineChart from '../../components/Charts/LineChart';
 import PieChart from '../../components/Charts/PieChart';

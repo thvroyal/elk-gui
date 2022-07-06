@@ -10,4 +10,4 @@ export const LOG_FILES = [
     'filebeat-7.16.2-2021.12.26-000001',
 ];
 
-export const BASE_URL = 'http://192.168.2.7:9200';
+export const BASE_URL = 'http://192.168.2.11:5000';

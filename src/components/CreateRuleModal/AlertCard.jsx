@@ -4,7 +4,6 @@ import React from 'react';
 
 const AlertCard = (props) => {
     const { getInputProps, getCheckboxProps } = useRadio(props);
-    console.log(props.iconEle);
     
     const input = getInputProps();
     const checkbox = getCheckboxProps();

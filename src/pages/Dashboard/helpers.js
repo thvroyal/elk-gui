@@ -28,6 +28,92 @@ export const getDataWithPayload = async (payload, source) => {
     }
 }
 
+export const createNewRule = async (data) => {
+  try {
+    const response = await axios({
+      method: 'POST',
+      url: `${BASE_URL}/rules`,
+      headers: {
+        'Content-Type': 'application/json'
+      },
+      data: {rule: data},
+    });
+    const status = get(response, 'status');
+    if (status === 200 || status === 201) {
+      return true;
+    }
+    else return false;
+  } catch (error) {
+    console.error(error);
+    return false;
+  }
+}
+
+export const updateRuleId = async (id, data) => {
+  try {
+    const response = await axios({
+      method: 'PUT',
+      url: `${BASE_URL}/rule/${id}`,
+      headers: {
+        'Content-Type': 'application/json'
+      },
+      data: {rule: data},
+    });
+    const status = get(response, 'status');
+    if (status === 200 || status === 201) {
+      return true;
+    }
+    else return false;
+  } catch (error) {
+    console.error(error);
+    return false;
+  }
+}
+
+export const deleteRuleId = async (id) => {
+  try {
+    const response = await axios({
+      method: 'DELETE',
+      url: `${BASE_URL}/rule/${id}`
+    });
+    const status = get(response, 'status');
+    if (status === 200) {
+      return true;
+    }
+    else return false;
+  } catch (error) {
+    console.error(error);
+    return false;
+  }
+}
+
+export const getAllRules = async () => {
+  try {
+    const response = await axios({
+      method: 'GET',
+      url: `${BASE_URL}/rules`,
+    });
+    
+    const status = get(response, 'status');
+    if (status === 200) {
+      return {
+        data: response.data,
+        isSuccess: true,
+      };
+    }
+    else return {
+      data: null,
+      isSuccess: false
+    };
+  } catch (error) {
+    console.error(error);
+    return {
+      data: null,
+      isSuccess: false
+    };
+  }
+}
+
 export const generatePayloadApi = (fromDate, toDate, type) => {
     const fromDateFormatted = moment(fromDate).toISOString();
     const toDateFormatted = moment(toDate).toISOString();
