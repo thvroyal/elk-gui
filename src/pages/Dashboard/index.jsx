@@ -6,6 +6,7 @@ import LineChart from '../../components/Charts/LineChart';
 import PieChart from '../../components/Charts/PieChart';
 import CreateRuleModal from '../../components/CreateRuleModal';
 import ListRulesDrawer from '../../components/ListRulesDrawer';
+import Notifications from '../../components/Notifications';
 import { IP_CHART_ID, LOG_FILES, REQUESTS_CHART_ID, REQUEST_THRESHOLD_DEFAULT, TOP_VALUE_CHART_ID } from './constants';
 import { generatePayloadApi, getDataWithPayload } from './helpers';
 import PickDate from './PickDate';
@@ -16,6 +17,34 @@ const MAP_DURATION = {
   hours: 60*60,
   days: 60*60*24,
 };
+
+const mockDataNotify = [
+  {
+      "_id" : "62d0170dc6a12f78f1dc9204", 
+      "time" : "2022-07-14T13:15:40.384Z", 
+      "file" : "/etc/passwd", 
+      "process" : "dpkg", 
+      "actor" : "root", 
+      "resolved" : false 
+  },
+  {
+    "_id" : "62d0170dc6a12f78f1dc9205", 
+    "time" : "2022-07-14T13:15:40.384Z", 
+    "file" : "/etc/passwd", 
+    "process" : "dpkg", 
+    "actor" : "root", 
+    "resolved" : true 
+},
+{
+  "_id" : "62d0170dc6a12f78f1dc9206", 
+  "time" : "2022-07-14T13:15:40.384Z", 
+  "file" : "/etc/passwd", 
+  "process" : "dpkg", 
+  "actor" : "root", 
+  "resolved" : false 
+}
+];
+
 
 export default function Dashboard() {
   const [request, setRequest] = useState(REQUEST_THRESHOLD_DEFAULT);
@@ -115,10 +144,13 @@ export default function Dashboard() {
     <Box bg="#F7FAFC">
       <Flex justify="space-between" align="center" bg="white" w="100%" py="24px" px="24px" borderBottom="1px" borderColor="#CBD5E0">
           <Heading as="h4" fontSize="24px" color="#171923" whiteSpace="nowrap">ELK-Dang Dashboard</Heading>
-          <ButtonGroup size='sm' isAttached variant='outline'>
-            <ListRulesDrawer placement="right" />
-            <CreateRuleModal />
-          </ButtonGroup>
+          <HStack spacing="20px">
+            <Notifications notifyData={mockDataNotify}/>
+            <ButtonGroup size='sm' isAttached variant='outline'>
+              <ListRulesDrawer placement="right" />
+              <CreateRuleModal />
+            </ButtonGroup>
+          </HStack>
       </Flex>
       <Container maxW="1328px">
       <HStack spacing="32px" marginTop="26px">

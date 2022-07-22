@@ -1,9 +1,16 @@
 import { DeleteIcon } from '@chakra-ui/icons';
 import { Flex, HStack, IconButton, Switch, Text } from '@chakra-ui/react';
+import { useState } from 'react';
 import CreateRuleModal from '../CreateRuleModal';
 
 const RowRule = ({ data, onClickDelete }) => {
-    const { name, description, onGetRule } = data;
+    const { name, description, onGetRule, status } = data;
+    const activeProp = status === 'Enable';
+    const [active, setActive] = useState(activeProp);
+    
+    const handleToggleSwitch = (event) => {
+        console.log(event);
+    }
     
     return (
         <Flex borderBottomWidth="1px" borderBottomColor="#E2E8F0" px="24px" py="16px" justify="space-between" align="center">
@@ -15,7 +22,7 @@ const RowRule = ({ data, onClickDelete }) => {
                 </HStack>
                 <Text fontSize="12px" color="rgba(45, 55, 72, 0.5)" fontWeight={400}>{description}</Text>
             </Flex>
-            <Switch />
+            <Switch isChecked={active} onChange={handleToggleSwitch} />
         </Flex>
     )
 };
