@@ -1,6 +1,7 @@
 import { CloseIcon } from '@chakra-ui/icons';
 import { Box, Button, Divider, Flex, FormLabel, HStack, IconButton, Input, Text, VStack } from '@chakra-ui/react';
 import { useRef } from 'react';
+import { fieldLabelMap } from '../../pages/Dashboard/constants';
 
 const mockData = [
     {
@@ -21,7 +22,7 @@ const Pill = ({ label, value, color = '#38A169', onChange, index }) => {
   }
   return (
     <>
-      <Text fontSize="sm" color={color}>{label}</Text>
+      <Text fontSize="sm" color={color}>{fieldLabelMap[label]}</Text>
       <Input ref={inputRef} value={value} size='sm' width="130px" borderRadius="6px" onChange={handleChangeInput} />
     </>
   )

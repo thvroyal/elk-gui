@@ -11,3 +11,12 @@ export const LOG_FILES = [
 ];
 
 export const BASE_URL = 'http://192.168.2.11:5000';
+
+export const fieldLabelMap = {
+  'url': 'URL Pattern',
+  'remote_ip': 'Remote IP',
+  'process.name': 'Process',
+  'destination.ip': 'Destination IP',
+  'user.name': 'Actor',
+  'file.path': 'File Path',
+};
