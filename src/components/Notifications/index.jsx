@@ -3,7 +3,7 @@ import React, { useState } from 'react';
 import { RingIcon } from '../Icons';
 import moment from 'moment';
 
-const Notifications = ({ notifyData }) => {
+const Notifications = ({ notifyData, onClickResolve }) => {
     
     const [filterBy, setFilterBy] = useState("all");
     
@@ -31,10 +31,6 @@ const Notifications = ({ notifyData }) => {
     
     const handleClickFilterBy = (type) => {
         setFilterBy(type);
-    }
-    
-    const handleResolveNotification = (id) => {
-        console.log(id);
     }
     
     const dataProcessed = preprocessData(notifyData);
@@ -98,7 +94,7 @@ const Notifications = ({ notifyData }) => {
                                 <Text color="gray.500">•</Text>
                                 <Badge 
                                     colorScheme={data.resolved ? 'green' : 'red'}
-                                    onClick={() => handleResolveNotification(data._id)}
+                                    onClick={() => onClickResolve(data)}
                                 >
                                     {data.resolved ? "resolved" : "unsolved"}
                                 </Badge>

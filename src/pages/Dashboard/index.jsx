@@ -37,7 +37,7 @@ const mockDataNotify = [
 },
 {
   "_id" : "62d0170dc6a12f78f1dc9206", 
-  "time" : "2022-07-14T13:15:40.384Z", 
+  "time" : "2022-07-10T13:15:40.384Z", 
   "file" : "/etc/passwd", 
   "process" : "dpkg", 
   "actor" : "root", 
@@ -139,13 +139,20 @@ export default function Dashboard() {
       request, perTime, startDate, endDate
     })
   }
+  const handleClickResolve = (data) => {
+    if (data.resolved) {
+      return;
+    }
+    console.log(data);
+    //TODO: call get new notifications after resolving
+  }
   
   return (
     <Box bg="#F7FAFC">
       <Flex justify="space-between" align="center" bg="white" w="100%" py="24px" px="24px" borderBottom="1px" borderColor="#CBD5E0">
           <Heading as="h4" fontSize="24px" color="#171923" whiteSpace="nowrap">ELK-Dang Dashboard</Heading>
           <HStack spacing="20px">
-            <Notifications notifyData={mockDataNotify}/>
+            <Notifications notifyData={mockDataNotify} onClickResolve={handleClickResolve} />
             <ButtonGroup size='sm' isAttached variant='outline'>
               <ListRulesDrawer placement="right" />
               <CreateRuleModal />
