@@ -1,14 +1,19 @@
-import { Button, Badge, Flex, HStack, IconButton, Popover, PopoverArrow, PopoverBody, PopoverCloseButton, PopoverContent, PopoverHeader, PopoverTrigger, Portal, Text } from '@chakra-ui/react';
+import { Badge, Button, Flex, HStack, Box, IconButton, Popover, PopoverArrow, PopoverBody, PopoverCloseButton, PopoverContent, PopoverHeader, PopoverTrigger, Portal, Text } from '@chakra-ui/react';
+import moment from 'moment';
 import React, { useState } from 'react';
 import { RingIcon } from '../Icons';
-import moment from 'moment';
 
 const Notifications = ({ notifyData, onClickResolve }) => {
     
     const [filterBy, setFilterBy] = useState("all");
     
     const preprocessData = (notifyData) => {
-        return notifyData.map(notify => {
+        let numOfUnsolved = 0;
+        const newNotifyData = notifyData.map(notify => {
+            if (!notify.resolved) {
+                numOfUnsolved++;
+            };
+            
             let msg = "";
             if ("file" in notify) {
                 msg = `Process ${notify.process} running under user ${notify.actor} interacted with file ${notify.file}`
@@ -27,18 +32,37 @@ const Notifications = ({ notifyData, onClickResolve }) => {
             || (!notify.resolved && filterBy === 'unsolved') 
             || (filterBy === "all")
         })
+        
+        return {
+            data: newNotifyData.reverse(),
+            numOfUnsolved,
+        }
     }
     
     const handleClickFilterBy = (type) => {
         setFilterBy(type);
     }
     
-    const dataProcessed = preprocessData(notifyData);
+    const { data: dataProcessed, numOfUnsolved } = preprocessData(notifyData);
     
     return (
         <Popover>
             <PopoverTrigger>
-                <IconButton icon={<RingIcon />} fontSize="20px" variant="outline" />
+                <Box position="relative">
+                    <IconButton icon={<RingIcon />} fontSize="20px" variant="outline" />
+                    <Badge 
+                        variant="solid" 
+                        colorScheme="red" 
+                        rounded="12px" 
+                        position="absolute"
+                        border="4px"
+                        borderColor="white" 
+                        top={-3} 
+                        right={-4}
+                    >
+                        {numOfUnsolved > 99 ? '99+' : numOfUnsolved}
+                    </Badge>
+                </Box>
             </PopoverTrigger>
             <Portal>
                 <PopoverContent>
@@ -86,7 +110,7 @@ const Notifications = ({ notifyData, onClickResolve }) => {
                             }}
                             p="10px"
                             cursor="pointer"
-                            key={data._id}
+                            key={data._id.$oid}
                         >
                             <Text mb="4px">{data.msg}</Text>
                             <HStack>

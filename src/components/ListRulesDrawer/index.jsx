@@ -1,10 +1,9 @@
 import { Drawer, DrawerBody, DrawerContent, DrawerHeader, DrawerOverlay, Button, useDisclosure, DrawerCloseButton } from '@chakra-ui/react';
-import React, { useState } from 'react';
+import React, { useEffect, useState } from 'react';
 import { deleteRuleId, getAllRules } from '../../pages/Dashboard/helpers';
 import RowRule from './RowRule';
 
-const ListRulesDrawer = ({ placement }) => {
-    const { isOpen, onOpen, onClose } = useDisclosure();
+const DrawerContainer = ({ isOpen, onClose, placement }) => {
     const [listRules, setListRules] = useState([]);
     
     const getRule = () => {
@@ -17,10 +16,10 @@ const ListRulesDrawer = ({ placement }) => {
             console.error(err);
         })
     }
-    const handleOpen = () => {
+    
+    useEffect(() => {
         getRule();
-        onOpen();
-    }
+    }, []);
     
     const handleClickDelete = (id, name) => {
         deleteRuleId(id).then(res => {
@@ -30,9 +29,7 @@ const ListRulesDrawer = ({ placement }) => {
         });
     }
     return (
-        <>
-            <Button onClick={handleOpen}>List Rules</Button>
-            <Drawer placement={placement} onClose={onClose} isOpen={isOpen} size="sm">
+        <Drawer placement={placement} onClose={onClose} isOpen={isOpen} size="sm">
                 <DrawerOverlay />
                 <DrawerContent>
                     <DrawerCloseButton />
@@ -44,6 +41,16 @@ const ListRulesDrawer = ({ placement }) => {
                     </DrawerBody>
                 </DrawerContent>
             </Drawer>
+    )
+}
+const ListRulesDrawer = ({ placement }) => {
+    const { isOpen, onOpen, onClose } = useDisclosure();
+    
+    
+    return (
+        <>
+            <Button onClick={onOpen}>List Rules</Button>
+            {isOpen && <DrawerContainer isOpen={isOpen} onClose={onClose} placement={placement} />}
         </>
     )
 }

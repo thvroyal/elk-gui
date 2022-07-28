@@ -114,6 +114,52 @@ export const getAllRules = async () => {
   }
 }
 
+export const getNotifications = async () => {
+  try {
+    const response = await axios({
+      method: 'GET',
+      url: `${BASE_URL}/notis`,
+    });
+    
+    const status = get(response, 'status');
+    if (status === 200) {
+      return {
+        data: response.data,
+        isSuccess: true,
+      };
+    } else return {
+      data: null,
+      isSuccess: false
+    };
+  } catch (error) {
+    return {
+      data: null,
+      isSuccess: false,
+    }
+  }
+}
+
+export const resolveProblem = async (data) => {
+  const dataWithoutId = {...data};
+  delete dataWithoutId._id;
+  
+  try {
+    const response = await axios({
+      method: 'PUT',
+      url: `${BASE_URL}/noti/${data._id.$oid}`,
+      data: {noti: dataWithoutId}
+    })
+    
+    const status = get(response, 'status');
+    if (status === 200 || status === 201) {
+      return true;
+    }
+    return false;
+  } catch (error) {
+    return false;
+  }
+}
+
 export const generatePayloadApi = (fromDate, toDate, type) => {
     const fromDateFormatted = moment(fromDate).toISOString();
     const toDateFormatted = moment(toDate).toISOString();

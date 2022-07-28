@@ -25,12 +25,12 @@ const typeList = ['Web', 'Network', 'System'];
 
 const fieldOfType = {
   Allowlist: {
-    Web: {'remote_ip': ''},
+    Web: {'nginx.access.remote_ip': ''},
     Network: {'process.name': '', 'destination.ip': '', 'user.name': ''},
     System: {'user.name': ''},
   },
   Blacklist: {
-    Web: {'url': '', 'remote_ip': ''},
+    Web: {'nginx.access.url': '', 'nginx.access.remote_ip': ''},
     Network: {'process.name': '', 'destination.ip': '', 'user.name': ''},
     System: {'file.path': '', 'process.name': ''},
   }
@@ -42,9 +42,25 @@ const CreateRuleModal = (props) => {
     const initialRef = React.useRef(null);
     
     const [fieldAlert, setFieldAlert] = useState(alertOptions[0].value);
-    const [allowlist, setAllowlist] = useState({});
-    const [blacklist, setBlacklist] = useState({});
     const [type, setType] = useState(typeList[0]);
+    const [allowlist, setAllowlist] = useState(typeList.reduce(
+      (acc, type) => {
+        return {
+          ...acc,
+            [type]: [fieldOfType['Allowlist'][typeList[0]]],
+        }
+      },
+      {}
+    ));
+    const [blacklist, setBlacklist] = useState(typeList.reduce(
+      (acc, type) => {
+        return {
+          ...acc,
+            [type]: [fieldOfType['Blacklist'][typeList[0]]],
+        }
+      },
+      {}
+    ));
     
     const toast = useToast();
     
@@ -86,8 +102,24 @@ const CreateRuleModal = (props) => {
     
     const clearState = () => {
       setFieldAlert(alertOptions[0].value);
-      setAllowlist({});
-      setBlacklist({});
+      setAllowlist(typeList.reduce(
+        (acc, type) => {
+          return {
+            ...acc,
+              [type]: [fieldOfType['Allowlist'][typeList[0]]],
+          }
+        },
+        {}
+      ));
+      setBlacklist(typeList.reduce(
+        (acc, type) => {
+          return {
+            ...acc,
+              [type]: [fieldOfType['Blacklist'][typeList[0]]],
+          }
+        },
+        {}
+      ));
       setType(typeList[0]);
     };
     

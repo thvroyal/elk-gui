@@ -8,7 +8,7 @@ import CreateRuleModal from '../../components/CreateRuleModal';
 import ListRulesDrawer from '../../components/ListRulesDrawer';
 import Notifications from '../../components/Notifications';
 import { IP_CHART_ID, LOG_FILES, REQUESTS_CHART_ID, REQUEST_THRESHOLD_DEFAULT, TOP_VALUE_CHART_ID } from './constants';
-import { generatePayloadApi, getDataWithPayload } from './helpers';
+import { generatePayloadApi, getDataWithPayload, getNotifications, resolveProblem } from './helpers';
 import PickDate from './PickDate';
 
 const MAP_DURATION = {
@@ -58,6 +58,7 @@ export default function Dashboard() {
   const [sourceId, setSourceId] = useState(0);
   const [realtime, setRealtime] = useState(false);
   const [intervalIdState, setIntervalIdState] = useState(null);
+  const [notifyData, setNotifyData] = useState([]);
   
   const warningToast = useToast();
   
@@ -111,6 +112,17 @@ export default function Dashboard() {
     return () => clearInterval(intervalId);
   },[startDate, endDate, sourceId, perTime, realtime, unit]);
   
+  useEffect(() => {
+    const intervalId = setInterval(() => {
+      getNotifications().then(res => {
+          setNotifyData(res.data);
+      })
+    }, 1000);
+    
+    return () => clearInterval(intervalId);
+
+}, []);
+  
   const requestRef = useRef();
   const perTimeRef = useRef();
   
@@ -140,11 +152,20 @@ export default function Dashboard() {
     })
   }
   const handleClickResolve = (data) => {
-    if (data.resolved) {
-      return;
+    const newData = {
+      ...data,
+      resolved: !data.resolved,
     }
-    console.log(data);
-    //TODO: call get new notifications after resolving
+    resolveProblem(newData).then(res => {
+      if (res) {
+        const newNotifyData = notifyData.map(noti => {
+          if (noti._id.$oid === newData._id.$oid) {
+            return newData;
+          } else return noti;
+        })
+        setNotifyData(newNotifyData);
+      }
+    })
   }
   
   return (
@@ -152,7 +173,7 @@ export default function Dashboard() {
       <Flex justify="space-between" align="center" bg="white" w="100%" py="24px" px="24px" borderBottom="1px" borderColor="#CBD5E0">
           <Heading as="h4" fontSize="24px" color="#171923" whiteSpace="nowrap">ELK-Dang Dashboard</Heading>
           <HStack spacing="20px">
-            <Notifications notifyData={mockDataNotify} onClickResolve={handleClickResolve} />
+            <Notifications notifyData={notifyData} onClickResolve={handleClickResolve} />
             <ButtonGroup size='sm' isAttached variant='outline'>
               <ListRulesDrawer placement="right" />
               <CreateRuleModal />
