@@ -20,7 +20,7 @@ const Notifications = ({ notifyData, onClickResolve }) => {
             } else if ("destination" in notify) {
                 msg = `User ${notify.actor} connected to ${notify.destination} through process ${notify.process}`
             } else {
-                msg = `${notify.time}: Remote IP ${notify.remote_ip} accessed URL ${notify.url}`
+                msg = `Remote IP ${notify.remote_ip} accessed URL ${notify.url}`
             }
             
             return {
