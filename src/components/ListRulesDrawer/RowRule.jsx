@@ -1,13 +1,16 @@
 import { DeleteIcon } from '@chakra-ui/icons';
 import { Flex, HStack, IconButton, Switch, Text } from '@chakra-ui/react';
-import { useState } from 'react';
+import { useEffect, useState } from 'react';
 import { updateRuleId } from '../../pages/Dashboard/helpers';
 import CreateRuleModal from '../CreateRuleModal';
 
-const RowRule = ({ data, onClickDelete }) => {
-    const { name, description, onGetRule, status } = data;
-    const activeProp = status === 'Enable';
-    const [active, setActive] = useState(activeProp);
+const RowRule = ({ data, onClickDelete, onGetRule }) => {
+    const { name, description, status } = data;
+    const [active, setActive] = useState(false);
+    
+    useEffect(() => {
+        setActive(status === 'Enable');
+    }, [status]);
     
     const handleToggleSwitch = (event) => {
         const newData = {

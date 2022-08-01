@@ -242,8 +242,9 @@ const CreateRuleModal = (props) => {
                 description: data ? data.description : '',
                 severity: data ? data.severity : 'LOW',
                 status: data ? data.status === 'Enable' : false,
+                host: data ? data.host : 'All',
               }}
-              onSubmit={(values, actions) => {
+              onSubmit={ async (values, actions) => {
                 const newValues = {
                   ...values,
                   alert: fieldAlert,
@@ -252,10 +253,10 @@ const CreateRuleModal = (props) => {
                   blacklist: cleanData(blacklist[type]),
                   status: values.status ? 'Enable' : 'Disable',
                 }
-                const res = isEdit ? updateRuleId(data._id.$oid, newValues) : createNewRule(newValues);
+                const res = isEdit ? await updateRuleId(data._id.$oid, newValues) : await createNewRule(newValues);
                 if (res) {
                   actions.setSubmitting(false);
-                  isEdit && onGetRule && onGetRule();
+                  isEdit && onGetRule && await onGetRule();
                   toast({
                     title: `Rule is ${isEdit ? 'saved' : 'created'}.`,
                     description: `Rule name: ${values.name}`,
@@ -300,6 +301,19 @@ const CreateRuleModal = (props) => {
                               ))}
                             </HStack>
                           </RadioGroup>
+                        </FormControl>
+                      )}
+                    </Field>
+                    
+                    <Field name='host' key="host">
+                      {({ field }) => (
+                        <FormControl my={4} w="200px">
+                          <FormLabel htmlFor='host'>Host</FormLabel>
+                          <Select {...field} id='host'>
+                            <option value="All">All</option>
+                            <option value="agent1">Agent 1</option>
+                            <option value="agent2">Agent 2</option>
+                          </Select>
                         </FormControl>
                       )}
                     </Field>
@@ -358,7 +372,7 @@ const CreateRuleModal = (props) => {
                           <FormLabel htmlFor='email-alerts' mb='0'>
                             Active rule
                           </FormLabel>
-                          <Switch {...field} />
+                          <Switch isChecked={field.value} {...field} />
                         </FormControl>
                       )}
                     </Field>
