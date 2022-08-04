@@ -160,6 +160,32 @@ export const resolveProblem = async (data) => {
   }
 }
 
+export const getDataFromChartApi = async (endpoint, fromDate, toDate, host) => {
+  const fromDateFormatted = moment(fromDate).toISOString();
+  const toDateFormatted = moment(toDate).toISOString();
+  
+  try {
+    const response = await axios({
+      method: 'POST',
+      url: `${BASE_URL}/chart/${endpoint}`,
+      headers: {
+        'Content-Type': 'application/json'
+      },
+      data: {
+        chart: {
+          from: fromDateFormatted,
+          to: toDateFormatted,
+          host,
+        }
+      }
+    })
+    
+    return response.data;
+  } catch (error) {
+    console.log(error);
+  }
+}
+
 export const generatePayloadApi = (fromDate, toDate, type) => {
     const fromDateFormatted = moment(fromDate).toISOString();
     const toDateFormatted = moment(toDate).toISOString();

@@ -7,9 +7,9 @@ const Notifications = ({ notifyData, onClickResolve }) => {
     
     const [filterBy, setFilterBy] = useState("all");
     
-    const preprocessData = (notifyData) => {
+    const preprocessData = (notifyData = []) => {
         let numOfUnsolved = 0;
-        const newNotifyData = notifyData.map(notify => {
+        const newNotifyData = notifyData && notifyData.map(notify => {
             if (!notify.resolved) {
                 numOfUnsolved++;
             };
@@ -34,7 +34,7 @@ const Notifications = ({ notifyData, onClickResolve }) => {
         })
         
         return {
-            data: newNotifyData.reverse(),
+            data: newNotifyData?.reverse(),
             numOfUnsolved,
         }
     }
