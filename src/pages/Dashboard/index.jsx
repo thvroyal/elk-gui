@@ -1,4 +1,4 @@
-import { Box, Button, ButtonGroup, Container, Flex, Heading, HStack } from '@chakra-ui/react';
+import { Box, Button, ButtonGroup, Container, Flex, Heading, HStack, Select } from '@chakra-ui/react';
 import { useEffect, useState } from 'react';
 import HorizontalBarChart from '../../components/Charts/HorizontalBarChart';
 import LineChart from '../../components/Charts/LineChart';
@@ -117,6 +117,13 @@ export default function Dashboard() {
           <HStack spacing="10px">
             <Box fontSize="18px" color="gray.400">To</Box>
             <PickDate dateDefault={endDate} setDate={setEndDate} />
+          </HStack>
+          <HStack spacing="10px">
+            <Box fontSize="18px" color="gray.400">Host</Box>
+            <Select w="150px" size="lg" onChange={(e) => setHost(e.target.value)} value={host}>
+              <option value="agent1">Agent 1</option>
+              <option value="agent2">Agent 2</option>
+            </Select>
           </HStack>
           <Button size="lg" colorScheme="blue" onClick={handleClickUpdate}>Update</Button>
         </HStack>
