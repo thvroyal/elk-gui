@@ -28,7 +28,7 @@ export default class HorizontalBarChart extends ReactAmChart {
     titleFontSize: 14,
     yAxisFontSize: 14,
     defaultFillColor: '#4CAF50',
-    fontColor: 'rgba(0, 0, 0, 0.54)',
+    fontColor: '#CBD5E0',
     fontFamily: 'Roboto, "Helvetica Neue", sans-serif'
   };
 
@@ -131,7 +131,7 @@ export default class HorizontalBarChart extends ReactAmChart {
         <div className={styles.divider}/>
         <div className={styles.data}>
           <Text color="black" fontSize="12px" fontWeight="600">{'{categoryY} '}</Text>
-           <Text color="black">{`{valueX}`}</Text>
+           <Text color="black" fontSize="14px">{`{valueX}`}</Text>
         </div>
       </div>
     );

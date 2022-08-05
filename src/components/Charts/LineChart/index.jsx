@@ -35,7 +35,7 @@ export default class LineChart extends ReactAmChart {
     chartColor: {
       firstLineColor: "#00BCD4",
       secondLineColor: "#3F51B5",
-      labelColor:"#757575",
+      labelColor:"#CBD5E0",
       tooltipBackgroundColor:"#FFFFFF",
       thresholdLine: '#DC143C' 
     },
@@ -135,13 +135,13 @@ export default class LineChart extends ReactAmChart {
             this.bullet.circle.radius = 4;
             this.bullet.circle.fill = am4core.color(chartColor.firstLineColor);
             
-            // Create threshold line
-            this.avgLine = this.valueAxis.axisRanges.create();
-            this.avgLine.value = 0;
-            this.avgLine.grid.stroke = am4core.color(chartColor.thresholdLine);
-            this.avgLine.grid.strokeWidth = 2;
-            this.avgLine.grid.strokeOpacity = 1;
-            this.avgLine.grid.above = true;
+            // // Create threshold line
+            // this.avgLine = this.valueAxis.axisRanges.create();
+            // this.avgLine.value = 0;
+            // this.avgLine.grid.stroke = am4core.color(chartColor.thresholdLine);
+            // this.avgLine.grid.strokeWidth = 2;
+            // this.avgLine.grid.strokeOpacity = 1;
+            // this.avgLine.grid.above = true;
 
             //Create HTML toolTips
             this.firstSeries.tooltip.getFillFromObject = false;
@@ -171,9 +171,8 @@ export default class LineChart extends ReactAmChart {
         // Update text for line serie
         this.valueAxis.title.text = selectBy;
         const dataProcessed = this.preProcessData(data);
-        console.log(dataProcessed);
         chart.data = dataProcessed;
-        this.avgLine.value = threshold;
+        // this.avgLine.value = threshold;
         return chart;
     }
 }

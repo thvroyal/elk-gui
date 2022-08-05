@@ -30,14 +30,14 @@ const RowRule = ({ data, onClickDelete, onGetRule }) => {
     }
     
     return (
-        <Flex borderBottomWidth="1px" borderBottomColor="#E2E8F0" px="24px" py="16px" justify="space-between" align="center">
+        <Flex borderBottomWidth="1px" borderBottomColor="gray.800" px="24px" py="16px" justify="space-between" align="center">
             <Flex direction="column">
                 <HStack spacing="10px">
                     <Text fontSize="16px" lineHeight="24px" fontWeight={500}>{name}</Text>
                     <CreateRuleModal isEdit data={data} onGetRule={onGetRule} />
                     <IconButton icon={<DeleteIcon />} variant="ghost" size="xs" colorScheme="red" onClick={onClickDelete} />
                 </HStack>
-                <Text fontSize="12px" color="rgba(45, 55, 72, 0.5)" fontWeight={400}>{description}</Text>
+                <Text fontSize="12px" color="gray.400" fontWeight={400}>{description}</Text>
             </Flex>
             <Switch isChecked={active} onChange={handleToggleSwitch} />
         </Flex>

@@ -9,19 +9,19 @@ const SummaryCards = ({ data }) => {
                 key={`${label}`} 
                 flexDirection="column" 
                 align="center"
-                backgroundColor="white"
+                backgroundColor="gray.700"
                 px="30px"
                 py="20px"
                 borderRadius="8px"
                 border="1px"
-                borderColor="#CBD5E0"
+                borderColor="gray.600"
                 w="100%"
                 _hover={{
                     borderColor: color ? color : "blue.600",
                 }}
             >
-                <Text color="gray.500">{label}</Text>
-                <Text fontSize="40px" fontWeight="500" color={color ? color : "blue.600"}>{value}</Text>
+                <Text color="gray.400">{label}</Text>
+                <Text fontSize="40px" fontWeight="500" color={color ? color : "blue.500"}>{value}</Text>
             </Flex>
         )
     }

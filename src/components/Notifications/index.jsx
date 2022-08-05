@@ -55,8 +55,8 @@ const Notifications = ({ notifyData, onClickResolve }) => {
                         colorScheme="red" 
                         rounded="12px" 
                         position="absolute"
-                        border="4px"
-                        borderColor="white" 
+                        border="2px"
+                        borderColor="whiteAlpha.100" 
                         top={-3} 
                         right={-4}
                     >
@@ -103,10 +103,10 @@ const Notifications = ({ notifyData, onClickResolve }) => {
                             flexDirection="column" 
                             alignItems="flex-start" 
                             borderBottom="1px" 
-                            borderBottomColor="gray.200" 
+                            borderBottomColor="gray.800" 
                             pb="10px"
                             _hover={{
-                                background: "gray.100"
+                                background: "gray.800"
                             }}
                             p="10px"
                             cursor="pointer"

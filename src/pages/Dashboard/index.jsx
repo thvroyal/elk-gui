@@ -97,9 +97,9 @@ export default function Dashboard() {
   }
   
   return (
-    <Box bg="#F7FAFC">
-      <Flex justify="space-between" align="center" bg="white" w="100%" py="24px" px="24px" borderBottom="1px" borderColor="#CBD5E0">
-          <Heading as="h4" fontSize="24px" color="#171923" whiteSpace="nowrap">ELK-Dang Dashboard</Heading>
+    <Box>
+      <Flex justify="space-between" align="center" bg="whiteAlpha.100" w="100%" py="24px" px="24px" borderBottom="1px" borderColor="whiteAlpha.300">
+          <Heading as="h4" fontSize="24px" color="white" whiteSpace="nowrap">ELK-Dang Dashboard</Heading>
           <HStack spacing="20px">
             <Notifications notifyData={notifyData} onClickResolve={handleClickResolve} />
             <ButtonGroup size='sm' isAttached variant='outline'>
@@ -111,11 +111,11 @@ export default function Dashboard() {
       <Container maxW="1328px">
         <HStack spacing="32px" marginTop="26px" justify="center">
           <HStack spacing="10px">
-            <Box fontSize="18px" color="#2D3748">From</Box>
+            <Box fontSize="18px" color="gray.400">From</Box>
             <PickDate dateDefault={startDate} setDate={setStartDate}/>
           </HStack>
           <HStack spacing="10px">
-            <Box fontSize="18px" color="#2D3748">To</Box>
+            <Box fontSize="18px" color="gray.400">To</Box>
             <PickDate dateDefault={endDate} setDate={setEndDate} />
           </HStack>
           <Button size="lg" colorScheme="blue" onClick={handleClickUpdate}>Update</Button>
@@ -130,17 +130,17 @@ export default function Dashboard() {
             {
               label: '4xx Response',
               value: `${((response4xx / requestCount) * 100).toFixed(2)}%`,
-              color: 'red.600'
+              color: 'red.500'
             },
             {
               label: '5xx Response',
               value: `${((response5xx / requestCount) * 100).toFixed(2)}%`,
-              color: 'red.600'
+              color: 'red.500'
             },
           ]} 
         />
         
-        <Flex bg="white" borderRadius="6px" border="1px" borderColor="#CBD5E0"
+        <Flex bg="gray.700" borderRadius="6px" border="1px" borderColor="gray.600"
           padding="10px" flexDirection="column" marginTop="32px" height="450px"
         >
           <Heading as="h5" size="xs" marginBottom="12px">Client IP request with timestamp</Heading>
@@ -150,7 +150,7 @@ export default function Dashboard() {
             endDate={endDate.toString()}
           />
         </Flex>
-        <Flex bg="white" borderRadius="6px" border="1px" borderColor="#CBD5E0"
+        <Flex bg="gray.700" borderRadius="6px" border="1px" borderColor="gray.600"
           padding="10px" flexDirection="column" marginTop="32px" height="450px"
         >
           <Heading as="h5" size="xs" marginBottom="12px">Process interacting sensitive files</Heading>
@@ -158,7 +158,7 @@ export default function Dashboard() {
               data={privileged} 
             />
         </Flex>
-        <Flex bg="white" borderRadius="6px" border="1px" borderColor="#CBD5E0"
+        <Flex bg="gray.700" borderRadius="6px" border="1px" borderColor="gray.600"
           padding="10px" flexDirection="column" marginY="32px" height="450px"
         >
           <Heading as="h5" size="xs" marginBottom="12px">User running network process</Heading>
