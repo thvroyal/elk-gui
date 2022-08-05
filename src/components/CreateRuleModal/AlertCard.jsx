@@ -16,7 +16,7 @@ const AlertCard = (props) => {
                 borderWidth='1px'
                 borderRadius='12px'
                 direction="column"
-                color="gray.600"
+                color="gray.400"
                 align="center"
                 _checked={{
                 bg: 'blue.800',
