@@ -35,199 +35,134 @@ const fieldOfType = {
     System: {'file.path': '', 'process.name': ''},
   }
 }
+const convertTypeListMap = (field) => {
+  return typeList.reduce((acc, type) => {
+    return {
+      ...acc,
+      [type]: [fieldOfType[field][type]]
+    }
+  }, {});
+};
 
-const CreateRuleModal = (props) => {
-    const { isEdit = false, data, onGetRule } = props;
-    const { isOpen, onOpen, onClose } = useDisclosure();
-    const initialRef = React.useRef(null);
-    
-    const [fieldAlert, setFieldAlert] = useState(alertOptions[0].value);
-    const [type, setType] = useState(typeList[0]);
-    const [allowlist, setAllowlist] = useState(typeList.reduce(
-      (acc, type) => {
-        return {
-          ...acc,
-            [type]: [fieldOfType['Allowlist'][typeList[0]]],
-        }
-      },
-      {}
-    ));
-    const [blacklist, setBlacklist] = useState(typeList.reduce(
-      (acc, type) => {
-        return {
-          ...acc,
-            [type]: [fieldOfType['Blacklist'][typeList[0]]],
-        }
-      },
-      {}
-    ));
-    
-    const toast = useToast();
-    
-    useEffect(() => {
-      setAllowlist(typeList.reduce(
-        (acc, type) => {
-          if (data && type === data.type) return {
-            ...acc,
-            [type]: data.allowlist,
-          }
-          return {
-            ...acc,
-            [type]: [fieldOfType['Allowlist'][type]],
-          }
-        },
-        {}
-      ))
-      
-      setBlacklist(typeList.reduce(
-        (acc, type) => {
-          if (data && type === data.type) return {
-            ...acc,
-            [type]: data.blacklist,
-          }
-          return {
-            ...acc,
-            [type]: [fieldOfType['Blacklist'][type]],
-          }
-        },
-        {}
-      ))
-      
-      if (data) {
-        setFieldAlert(data.alert);
-        setType(data.type);
+const cleanData = (list) => {
+  return list.reduce((acc, curr) => {
+    const obj = {};
+    for (const [key, value] of Object.entries(curr)) {
+      if (value !== '') {
+        obj[key] = value;
       }
+    }
+    if (Object.keys(obj).length > 0) return [...acc, obj]; else return acc;
+  }, [])
+}
+
+const RuleModal = ({ data, isEdit, isOpen, onClose, onGetRule }) => {
+  const initialRef = React.useRef(null);
+  const [fieldAlert, setFieldAlert] = useState(alertOptions[0].value);
+  const [type, setType] = useState(typeList[0]);
+  const [allowlist, setAllowlist] = useState(convertTypeListMap('Allowlist'));
+  const [blacklist, setBlacklist] = useState(convertTypeListMap('Blacklist'));
+  
+  const toast = useToast();
+  
+  const { getRootProps, getRadioProps } = useRadioGroup({
+    name: 'alert',
+    defaultValue: fieldAlert,
+    onChange: (value) => setFieldAlert(value),
+    value: fieldAlert,
+  })  
+  const group = getRootProps();
+  
+  
+  //useEffect to set initial data when editing rule
+  useEffect(() => {
+    if (data) {
+      setFieldAlert(data.alert);
+      setType(data.type);
       
-    }, [isEdit, data]);
-    
-    const clearState = () => {
-      setFieldAlert(alertOptions[0].value);
-      setAllowlist(typeList.reduce(
-        (acc, type) => {
+      setAllowlist({
+        ...allowlist,
+        [data.type]: data.allowlist,
+      });
+      
+      setBlacklist({
+        ...blacklist,
+        [data.type]: data.blacklist,
+      })
+    }
+  }, [data]);
+  
+  const handleChangeAllowlist = (field, value, index) => {
+    const newAllowlist = {
+      ...allowlist,
+      [type]: allowlist[type].map((item, idx) => {
+        if (idx === index) {
           return {
-            ...acc,
-              [type]: [fieldOfType['Allowlist'][typeList[0]]],
+            ...item,
+            [field]: value,
           }
-        },
-        {}
-      ));
-      setBlacklist(typeList.reduce(
-        (acc, type) => {
+        }
+        return item;
+      })
+    }
+    setAllowlist(newAllowlist);
+  };
+  
+  const handleChangeBlacklist = (field, value, index) => {
+    const newBlacklist = {
+      ...blacklist,
+      [type]: blacklist[type].map((item, idx) => {
+        if (idx === index) {
           return {
-            ...acc,
-              [type]: [fieldOfType['Blacklist'][typeList[0]]],
+            ...item,
+            [field]: value,
           }
-        },
-        {}
-      ));
-      setType(typeList[0]);
-    };
-    
-    const handleChangeAllowlist = (field, value, index) => {
+        }
+        return item;
+      })
+    }
+    setBlacklist(newBlacklist);
+  };
+  
+  const handleAddMore = (title) => {
+    if (title === "Allowlist") {
       const newAllowlist = {
         ...allowlist,
-        [type]: allowlist[type].map((item, idx) => {
-          if (idx === index) {
-            return {
-              ...item,
-              [field]: value,
-            }
-          }
-          return item;
-        })
+        [type]: [...allowlist[type], fieldOfType['Allowlist'][type]],
       }
+      
       setAllowlist(newAllowlist);
-    };
-    
-    const handleChangeBlacklist = (field, value, index) => {
+    } else {
       const newBlacklist = {
         ...blacklist,
-        [type]: blacklist[type].map((item, idx) => {
-          if (idx === index) {
-            return {
-              ...item,
-              [field]: value,
-            }
-          }
-          return item;
-        })
+        [type]: [...blacklist[type], fieldOfType['Blacklist'][type]],
+      }
+      
+      setBlacklist(newBlacklist);
+    }
+  }
+  
+  const handleDeleteItem = (title, index) => {
+    if (title === "Allowlist") {
+      const newAllowlist = {
+        ...allowlist,
+        [type]: allowlist[type].filter((_, idx) => idx !== index),
+      }
+      setAllowlist(newAllowlist);
+    } else {
+      const newBlacklist = {
+        ...blacklist,
+        [type]: blacklist[type].filter((_, idx) => idx !== index),
       }
       setBlacklist(newBlacklist);
     }
-    
-    const handleAddMore = (title) => {
-      if (title === "Allowlist") {
-        const newAllowlist = {
-          ...allowlist,
-          [type]: [...allowlist[type], fieldOfType['Allowlist'][type]],
-        }
-        
-        setAllowlist(newAllowlist);
-      } else {
-        const newBlacklist = {
-          ...blacklist,
-          [type]: [...blacklist[type], fieldOfType['Blacklist'][type]],
-        }
-        
-        setBlacklist(newBlacklist);
-      }
-    }
-    
-    const handleDeleteItem = (title, index) => {
-      if (title === "Allowlist") {
-        const newAllowlist = {
-          ...allowlist,
-          [type]: allowlist[type].filter((_, idx) => idx !== index),
-        }
-        setAllowlist(newAllowlist);
-      } else {
-        const newBlacklist = {
-          ...blacklist,
-          [type]: blacklist[type].filter((_, idx) => idx !== index),
-        }
-        setBlacklist(newBlacklist);
-      }
-    }
-    
-    const handleClose = () => {
-      clearState();
-      onClose();
-    }
-    
-    const { getRootProps, getRadioProps } = useRadioGroup({
-      name: 'alert',
-      defaultValue: 'Telegram',
-      onChange: (value) => setFieldAlert(value),
-    })
-    
-    const group = getRootProps();
-    
-    const cleanData = (list) => {
-      return list.reduce((acc, curr) => {
-        const obj = {};
-        for (const [key, value] of Object.entries(curr)) {
-          if (value !== '') {
-            obj[key] = value;
-          }
-        }
-        if (Object.keys(obj).length > 0) return [...acc, obj]; else return acc;
-      }, [])
-    }
-    
-    return (
-      <>
-        {isEdit ? <IconButton icon={<EditIcon />} variant="ghost" size="xs" colorScheme="blue" onClick={onOpen} /> : 
-          <IconButton
-            aria-label='Create new rule' 
-            icon={<AddIcon />} 
-            onClick={onOpen} 
-          />
-        }
-
-        <Modal
+  }
+  
+  return (
+    <Modal
           initialFocusRef={initialRef}
           isOpen={isOpen}
-          onClose={handleClose}
+          onClose={onClose}
           size="xl"
         >
           <ModalOverlay />
@@ -294,7 +229,7 @@ const CreateRuleModal = (props) => {
                       {({ field }) => (
                         <FormControl mt={4}>
                           <FormLabel as='legend'>Type</FormLabel>
-                          <RadioGroup defaultValue={typeList[0]}>
+                          <RadioGroup defaultValue={type}>
                             <HStack spacing='64px'>
                               {typeList.map(type => (
                                 <Radio onChange={() => setType(type)} value={type} key={type}>{type}</Radio>
@@ -353,7 +288,7 @@ const CreateRuleModal = (props) => {
                     
                     <FormControl mt={4}>
                       <FormLabel as='legend'>Alert</FormLabel>
-                      <RadioGroup defaultValue={alertOptions[0].value}>
+                      <RadioGroup defaultValue={fieldAlert}>
                         <HStack {...group} flex="1">
                           {alertOptions.map(option => {
                             const {value, icon} = option;
@@ -391,6 +326,30 @@ const CreateRuleModal = (props) => {
               
           </ModalContent>
         </Modal>
+  )
+}
+const CreateRuleModal = (props) => {
+    const { isEdit = false, data, onGetRule } = props;
+    const { isOpen, onOpen, onClose } = useDisclosure();
+    
+    return (
+      <>
+        {isEdit ? <IconButton icon={<EditIcon />} variant="ghost" size="xs" colorScheme="blue" onClick={onOpen} /> : 
+          <IconButton
+            aria-label='Create new rule' 
+            icon={<AddIcon />} 
+            onClick={onOpen} 
+          />
+        }
+
+        {isOpen && 
+          <RuleModal 
+            data={data} 
+            isEdit={isEdit} 
+            isOpen={isOpen} 
+            onClose={onClose}
+            onGetRule={onGetRule}
+        />}
       </>
     )
 }
